@@ -1,7 +1,10 @@
+#include <Wire.h>
+
+#include <RTClib.h>
 #include <MFRC522.h> // for the RFID
 #include <SPI.h> // for the RFID and SD card module
 #include <SD.h> // for the SD card
-#include <RTClib.h> // for the RTC
+
 
 // define pins for RFID
 #define CS_RFID 10
@@ -19,7 +22,7 @@ MFRC522 rfid(CS_RFID, RST_RFID);
 String uidString;
 
 // Instance of the class for RTC
-RTC_DS1307 rtc;
+RTC_DS3231 rtc;
 
 // Define check in time
 const int checkInHour = 9;
@@ -66,9 +69,6 @@ void setup() {
   else {
     // following line sets the RTC to the date & time this sketch was compiled
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-  }
-  if(!rtc.isrunning()) {
-    Serial.println("RTC is NOT running!");
   }
 }
 
