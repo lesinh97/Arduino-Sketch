@@ -23,7 +23,6 @@
 #define blueLed 2
 
 #define relay 5     // Set MOSFET Pin
-#define wipeB 6     // Button pin for WipeMode
 
 int lockDelay=10000; // lock stays open for 10 seconds.
 
