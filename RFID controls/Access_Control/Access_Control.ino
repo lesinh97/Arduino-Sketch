@@ -11,32 +11,12 @@
  * SPI SCK     SCK          13 / ICSP-3   52        D13        ICSP-3           15
  */
 
-#include <EEPROM.h>     // We are going to read and write PICC's UIDs from/to EEPROM
+#include <EEPROM.h>
 #include <SPI.h>        // RC522 Module uses SPI protocol
 #include <MFRC522.h>  // Library for Mifare RC522 Devices
 
-/*
-  Instead of a Relay you may want to use a servo. Servos can lock and unlock door locks too
-  Relay will be used by default
-*/
-
-// #include <Servo.h> 
-
-/*
-  For visualizing whats going on hardware we need some leds and to control door lock a relay and a wipe button
-  (or some other hardware) Used common anode led,digitalWriting HIGH turns OFF led Mind that if you are going 
-  to use common cathode led or just seperate leds, simply comment out #define COMMON_ANODE,
-*/
-
-//#define COMMON_ANODE
-
-#ifdef COMMON_ANODE
-#define LED_ON LOW
-#define LED_OFF HIGH
-#else
 #define LED_ON HIGH
 #define LED_OFF LOW
-#endif
 
 #define redLed 3    // Set Led Pins
 #define greenLed 4
@@ -64,65 +44,30 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 
 ///////////////////////////////////////// Setup ///////////////////////////////////
 void setup() {
-  //Arduino Pin Configuration
+
   pinMode(redLed, OUTPUT);
   pinMode(greenLed, OUTPUT);
   pinMode(blueLed, OUTPUT);
-  pinMode(wipeB, INPUT_PULLUP);   // Enable pin's pull up resistor
   pinMode(relay, OUTPUT);
-  //Be careful how relay circuit behave on while resetting or power-cycling your Arduino
-  digitalWrite(relay, LOW);    // Make sure door is locked - Setting Low as Solenoid is not 100% duty cycle
-  digitalWrite(redLed, LED_OFF);  // Make sure led is off
-  digitalWrite(greenLed, LED_OFF);  // Make sure led is off
-  digitalWrite(blueLed, LED_OFF); // Make sure led is off
+  
+  digitalWrite(relay, LOW);    
+  digitalWrite(redLed, LED_OFF);  
+  digitalWrite(greenLed, LED_OFF);
+  digitalWrite(blueLed, LED_OFF); 
 
   //Protocol Configuration
   Serial.begin(9600);  // Initialize serial communications with PC
   SPI.begin();           // MFRC522 Hardware uses SPI protocol
   mfrc522.PCD_Init();    // Initialize MFRC522 Hardware
 
-  //If you set Antenna Gain to Max it will increase reading distance
+
   //mfrc522.PCD_SetAntennaGain(mfrc522.RxGain_max);
 
-  Serial.println(F("Access Control Example v0.1"));   // For debugging purposes
+  Serial.println(F("Begin"));   // For debugging purposes
   ShowReaderDetails();  // Show details of PCD - MFRC522 Card Reader details
 
-  //Wipe Code - If the Button (wipeB) Pressed while setup run (powered on) it wipes EEPROM
-  if (digitalRead(wipeB) == LOW) {  // when button pressed pin should get low, button connected to ground
-    digitalWrite(redLed, LED_ON); // Red Led stays on to inform user we are going to wipe
-    Serial.println(F("Wipe Button Pressed"));
-    Serial.println(F("You have 15 seconds to Cancel"));
-    Serial.println(F("This will be remove all records and cannot be undone"));
-    delay(15000);                        // Give user enough time to cancel operation
-    if (digitalRead(wipeB) == LOW) {    // If button still be pressed, wipe EEPROM
-      Serial.println(F("Starting Wiping EEPROM"));
-      for (uint8_t x = 0; x < EEPROM.length(); x = x + 1) {    //Loop end of EEPROM address
-        if (EEPROM.read(x) == 0) {              //If EEPROM address 0
-          // do nothing, already clear, go to the next address in order to save time and reduce writes to EEPROM
-        }
-        else {
-          EEPROM.write(x, 0);       // if not write 0 to clear, it takes 3.3mS
-        }
-      }
-      Serial.println(F("EEPROM Successfully Wiped"));
-      digitalWrite(redLed, LED_OFF);  // visualize a successful wipe
-      delay(200);
-      digitalWrite(redLed, LED_ON);
-      delay(200);
-      digitalWrite(redLed, LED_OFF);
-      delay(200);
-      digitalWrite(redLed, LED_ON);
-      delay(200);
-      digitalWrite(redLed, LED_OFF);
-    }
-    else {
-      Serial.println(F("Wiping Cancelled")); // Show some feedback that the wipe button did not pressed for 15 seconds
-      digitalWrite(redLed, LED_OFF);
-    }
-  }
-  // Check if master card defined, if not let user choose a master card
-  // This also useful to just redefine the Master Card
-  // You can keep other EEPROM records just write other than 143 to EEPROM address 1
+  // Kiem tra trong EEPROM xem da co master card nao chua
+  // Tim hieu vi sao co so 143 o dia chi EEPROM 1
   // EEPROM address 1 should hold magical number which is '143'
   if (EEPROM.read(1) != 143) {
     Serial.println(F("No Master Card Defined"));
@@ -151,7 +96,7 @@ void setup() {
   Serial.println(F("-------------------"));
   Serial.println(F("Everything Ready"));
   Serial.println(F("Waiting PICCs to be scanned"));
-  cycleLeds();    // Everything ready lets give user some feedback by cycling leds
+  cycleLeds();  
 }
 
 
@@ -159,22 +104,6 @@ void setup() {
 void loop () {
   do {
     successRead = getID();  // sets successRead to 1 when we get read from reader otherwise 0
-    // When device is in use if wipe button pressed for 10 seconds initialize Master Card wiping  
-    if (digitalRead(wipeB) == LOW) { // Check if button is pressed
-      // Visualize normal operation is iterrupted by pressing wipe button Red is like more Warning to user
-      digitalWrite(redLed, LED_ON);  // Make sure led is off
-      digitalWrite(greenLed, LED_OFF);  // Make sure led is off
-      digitalWrite(blueLed, LED_OFF); // Make sure led is off
-      // Give some feedback 
-      Serial.println(F("Wipe Button Pressed"));
-      Serial.println(F("Master Card will be Erased! in 10 seconds"));
-      delay(10000);  // Wait 10 seconds to see user still wants to wipe
-      if (digitalRead(wipeB) == LOW) {
-        EEPROM.write(1, 0);                  // Reset Magic Number.
-        Serial.println(F("Restart device to re-program Master Card"));
-        while (1);
-      }
-    }
     if (programMode) {
       cycleLeds();              // Program Mode cycles through Red Green Blue waiting to read a new card
     }
