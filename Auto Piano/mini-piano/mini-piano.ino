@@ -5,28 +5,12 @@
 const int PIEZO = 11;   //  Phase transition/transfer pin
 const int LED = 13;
 
-int buttonSong = 8;
-const int BUTTON_C = 6;     // tune
-const int BUTTON_AS = 4;
-const int BUTTON_A = 3;
-const int BUTTON_G = 2;
 
 
 void setup()
 {
   Serial.begin(9600);
-  pinMode(LED, OUTPUT);
-  pinMode(BUTTON_C, INPUT);
-  digitalWrite(BUTTON_C,HIGH);
-  pinMode(BUTTON_AS, INPUT);
-  digitalWrite(BUTTON_AS,HIGH);
-  pinMode(BUTTON_A, INPUT);
-  digitalWrite(BUTTON_A,HIGH);
-  pinMode(BUTTON_G, INPUT);
-  digitalWrite(BUTTON_G,HIGH);
-  pinMode (buttonSong, INPUT);
-  digitalWrite(buttonSong, HIGH);
-  digitalWrite(LED,LOW);
+
 }
 
 
@@ -62,41 +46,16 @@ int noteDurations[] = {
 
 void loop()
 {
-  while(digitalRead(BUTTON_C) == ACTIVATED)
-  {
-    tone(PIEZO,NOTE_C5);
-    digitalWrite(LED,HIGH);
-  }
-  while(digitalRead(BUTTON_AS) == ACTIVATED)
-  {
-    tone(PIEZO,NOTE_AS4);
-    digitalWrite(LED,HIGH);
-  }
-
-  while(digitalRead(BUTTON_A) == ACTIVATED)
-  {
-    tone(PIEZO,NOTE_A4);
-    digitalWrite(LED,HIGH);
-  }
-
-  while(digitalRead(BUTTON_G) == ACTIVATED)
-  {
-    tone(PIEZO,NOTE_G4);
-    digitalWrite(LED,HIGH);
-  }
-
-  if(digitalRead(buttonSong) == ACTIVATED) {
+    // put your main code here, to run repeatedly:
+ 
     for (int thisNote=0; thisNote <85; thisNote++) {
+       int gtquangtro=analogRead(A5);
+       Serial.println(gtquangtro);
       int noteDuration = 600 / noteDurations[thisNote];
       tone(11, melody[thisNote], noteDuration);
-      int pauseBetweenNotes = noteDuration * 1.50;
-      delay(pauseBetweenNotes);
+     // int pauseBetweenNotes = noteDuration * 1.50;
+      delay(gtquangtro*3);
       noTone(11);
     }
-
-  }
-
-  noTone(PIEZO);
-  digitalWrite(LED,LOW);
 
 }

@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "/home/ledsinh/Documents/PlatformIO/Projects/181102-153806-uno",
+			"name": "181102-153806-uno"
+		}
+	],
+	"settings": {
+		"terminal.integrated.env.linux": {
+			"PATH": "/home/ledsinh/.platformio/penv/bin:/home/ledsinh/.platformio/penv:/home/ledsinh/.rvm/gems/ruby-2.5.0/bin:/home/ledsinh/.rvm/gems/ruby-2.5.0@global/bin:/home/ledsinh/.rvm/rubies/ruby-2.5.0/bin:/home/ledsinh/bin:/home/ledsinh/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/ledsinh/.rvm/bin",
+			"PLATFORMIO_CALLER": "vscode"
+		}
+	}
+}
